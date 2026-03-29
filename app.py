@@ -16,20 +16,24 @@ st.set_page_config(
 # TITLE
 # ==============================
 st.title("💳 Credit Card Fraud Detection Dashboard")
-st.markdown("This application predicts whether a transaction is **Fraudulent** or **Legitimate** using a trained Machine Learning model.")
+st.markdown(
+    """
+    This application predicts whether a transaction is **Fraudulent** or **Legitimate**
+    using a trained **Machine Learning model**.
+    """
+)
 
 # ==============================
 # FILE PATHS
 # ==============================
-MODEL_PATH = "model/fraud_model.pkl"
-SCALER_PATH = "model/scaler.pkl"
-FEATURES_PATH = "model/feature_names.pkl"
-DATA_PATH = "data/creditcard.csv"
+MODEL_PATH = "fraud_model.pkl"
+SCALER_PATH = "scaler.pkl"
+FEATURES_PATH = "feature_names.pkl"
 
 # ==============================
 # CHECK FILES EXIST
 # ==============================
-required_files = [MODEL_PATH, SCALER_PATH, FEATURES_PATH, DATA_PATH]
+required_files = [MODEL_PATH, SCALER_PATH, FEATURES_PATH]
 
 for file in required_files:
     if not os.path.exists(file):
@@ -37,20 +41,27 @@ for file in required_files:
         st.stop()
 
 # ==============================
-# LOAD FILES
+# LOAD MODEL FILES
 # ==============================
 model = joblib.load(MODEL_PATH)
 scaler = joblib.load(SCALER_PATH)
 feature_names = joblib.load(FEATURES_PATH)
-df = pd.read_csv(DATA_PATH)
+
+# ==============================
+# DEFAULT VALUES (safe demo defaults)
+# ==============================
+default_values = {feature: 0.0 for feature in feature_names}
+
+if "Amount" in default_values:
+    default_values["Amount"] = 50.0
+
+if "Time" in default_values:
+    default_values["Time"] = 10000.0
 
 # ==============================
 # SIDEBAR INPUT
 # ==============================
 st.sidebar.header("📝 Enter Transaction Details")
-
-# Use median values as default input
-default_values = df.drop("Class", axis=1).median().to_dict()
 
 input_data = {}
 
@@ -64,7 +75,7 @@ for feature in feature_names:
 input_df = pd.DataFrame([input_data])
 
 # ==============================
-# MAIN SECTION
+# MAIN LAYOUT
 # ==============================
 col1, col2 = st.columns([1, 1])
 
@@ -76,7 +87,6 @@ with col2:
     st.subheader("📊 Prediction Result")
 
     if st.button("Predict Fraud"):
-        # Check if model is Random Forest or Logistic Regression
         model_name = type(model).__name__
 
         if model_name == "RandomForestClassifier":
@@ -102,34 +112,35 @@ with col2:
             st.error("Risk Level: High")
 
 # ==============================
-# DASHBOARD OVERVIEW
+# PROJECT OVERVIEW SECTION
 # ==============================
 st.markdown("---")
-st.subheader("📈 Dataset Overview")
+st.subheader("📌 Project Overview")
 
-total_transactions = len(df)
-fraud_transactions = df["Class"].sum()
-legit_transactions = total_transactions - fraud_transactions
-fraud_rate = (fraud_transactions / total_transactions) * 100
+st.markdown(
+    """
+    ### About this Project
+    This project demonstrates a **Credit Card Fraud Detection System**
+    built using **Machine Learning** and designed for deployment as a
+    **cloud-based analytics application**.
 
-c1, c2, c3, c4 = st.columns(4)
-c1.metric("Total Transactions", f"{total_transactions:,}")
-c2.metric("Fraud Cases", f"{fraud_transactions:,}")
-c3.metric("Legitimate Cases", f"{legit_transactions:,}")
-c4.metric("Fraud Rate", f"{fraud_rate:.4f}%")
+    ### Key Features
+    - Fraud / Legitimate transaction prediction
+    - Fraud probability score
+    - Risk level classification
+    - Interactive dashboard interface
+
+    ### Model Used
+    - **Random Forest Classifier** (Final Selected Model)
+
+    ### Business Value
+    - Helps identify suspicious financial transactions
+    - Supports fraud prevention and financial security
+    """
+)
 
 # ==============================
-# CLASS DISTRIBUTION CHART
+# FOOTER
 # ==============================
-st.markdown("### Fraud vs Legitimate Transactions")
-chart_df = pd.DataFrame({
-    "Transaction Type": ["Legitimate", "Fraud"],
-    "Count": [legit_transactions, fraud_transactions]
-})
-st.bar_chart(chart_df.set_index("Transaction Type"))
-
-# ==============================
-# SAMPLE DATA
-# ==============================
-st.markdown("### Sample Transaction Records")
-st.dataframe(df.head(10), use_container_width=True)
+st.markdown("---")
+st.caption("Developed as part of an Azure Cloud Technologies Final Project")
