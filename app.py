@@ -13,15 +13,40 @@ st.set_page_config(
 )
 
 # ==============================
-# TITLE
+# CUSTOM STYLING
 # ==============================
-st.title("💳 Credit Card Fraud Detection Dashboard")
-st.markdown(
-    """
-    This application predicts whether a transaction is **Fraudulent** or **Legitimate**
-    using a trained **Machine Learning model**.
-    """
-)
+st.markdown("""
+    <style>
+        .main-title {
+            font-size: 42px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+        .sub-text {
+            font-size: 18px;
+            color: #cfcfcf;
+        }
+        .section-header {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 20px;
+        }
+        .info-box {
+            background-color: #111827;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #374151;
+            margin-bottom: 20px;
+        }
+        .result-box {
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # ==============================
 # FILE PATHS
@@ -41,14 +66,14 @@ for file in required_files:
         st.stop()
 
 # ==============================
-# LOAD MODEL FILES
+# LOAD FILES
 # ==============================
 model = joblib.load(MODEL_PATH)
 scaler = joblib.load(SCALER_PATH)
 feature_names = joblib.load(FEATURES_PATH)
 
 # ==============================
-# DEFAULT VALUES (safe demo defaults)
+# DEFAULT VALUES
 # ==============================
 default_values = {feature: 0.0 for feature in feature_names}
 
@@ -59,9 +84,21 @@ if "Time" in default_values:
     default_values["Time"] = 10000.0
 
 # ==============================
+# HEADER
+# ==============================
+st.markdown('<div class="main-title">💳 Credit Card Fraud Detection Dashboard</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="sub-text">A Machine Learning-powered analytics application for identifying potentially fraudulent credit card transactions.</div>',
+    unsafe_allow_html=True
+)
+
+st.markdown("---")
+
+# ==============================
 # SIDEBAR INPUT
 # ==============================
-st.sidebar.header("📝 Enter Transaction Details")
+st.sidebar.header("📝 Transaction Inputs")
+st.sidebar.markdown("Adjust the transaction feature values below to test the fraud prediction model.")
 
 input_data = {}
 
@@ -77,16 +114,16 @@ input_df = pd.DataFrame([input_data])
 # ==============================
 # MAIN LAYOUT
 # ==============================
-col1, col2 = st.columns([1, 1])
+col1, col2 = st.columns([1.2, 1])
 
 with col1:
-    st.subheader("🔍 Input Transaction Data")
+    st.markdown('<div class="section-header">🔍 Transaction Feature Preview</div>', unsafe_allow_html=True)
     st.dataframe(input_df, use_container_width=True)
 
 with col2:
-    st.subheader("📊 Prediction Result")
+    st.markdown('<div class="section-header">📊 Prediction Engine</div>', unsafe_allow_html=True)
 
-    if st.button("Predict Fraud"):
+    if st.button("🚀 Run Fraud Prediction"):
         model_name = type(model).__name__
 
         if model_name == "RandomForestClassifier":
@@ -98,9 +135,15 @@ with col2:
             probability = model.predict_proba(scaled_input)[0][1]
 
         if prediction == 1:
-            st.error("⚠ Fraudulent Transaction Detected")
+            st.markdown(
+                f'<div class="result-box" style="background-color:#3b0d0d; color:#ff6b6b;">⚠ Fraudulent Transaction Detected</div>',
+                unsafe_allow_html=True
+            )
         else:
-            st.success("✅ Legitimate Transaction")
+            st.markdown(
+                f'<div class="result-box" style="background-color:#0f2f1d; color:#4ade80;">✅ Legitimate Transaction</div>',
+                unsafe_allow_html=True
+            )
 
         st.metric("Fraud Probability", f"{probability * 100:.2f}%")
 
@@ -112,32 +155,49 @@ with col2:
             st.error("Risk Level: High")
 
 # ==============================
-# PROJECT OVERVIEW SECTION
+# PROJECT OVERVIEW
 # ==============================
 st.markdown("---")
-st.subheader("📌 Project Overview")
+st.markdown('<div class="section-header">📌 Project Overview</div>', unsafe_allow_html=True)
 
-st.markdown(
-    """
-    ### About this Project
-    This project demonstrates a **Credit Card Fraud Detection System**
-    built using **Machine Learning** and designed for deployment as a
-    **cloud-based analytics application**.
+st.markdown("""
+<div class="info-box">
+    <h3>About this Project</h3>
+    <p>
+        This project demonstrates a <b>Credit Card Fraud Detection System</b> built using
+        <b>Machine Learning</b> and designed as a <b>cloud-based analytics application</b>.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
-    ### Key Features
-    - Fraud / Legitimate transaction prediction
-    - Fraud probability score
-    - Risk level classification
-    - Interactive dashboard interface
+st.markdown("""
+<div class="info-box">
+    <h3>Key Features</h3>
+    <ul>
+        <li>Fraud / Legitimate transaction prediction</li>
+        <li>Fraud probability score</li>
+        <li>Risk level classification</li>
+        <li>Interactive cloud-hosted dashboard</li>
+    </ul>
+</div>
+""", unsafe_allow_html=True)
 
-    ### Model Used
-    - **Random Forest Classifier** (Final Selected Model)
+st.markdown("""
+<div class="info-box">
+    <h3>Model Used</h3>
+    <p><b>Random Forest Classifier</b> (Final Selected Model)</p>
+</div>
+""", unsafe_allow_html=True)
 
-    ### Business Value
-    - Helps identify suspicious financial transactions
-    - Supports fraud prevention and financial security
-    """
-)
+st.markdown("""
+<div class="info-box">
+    <h3>Business Value</h3>
+    <p>
+        This system can help financial institutions identify suspicious transactions early,
+        reduce financial losses, and improve fraud prevention workflows.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
 # ==============================
 # FOOTER
